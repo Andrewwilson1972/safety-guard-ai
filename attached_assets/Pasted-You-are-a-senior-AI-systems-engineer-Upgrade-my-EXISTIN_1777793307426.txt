@@ -1,0 +1,207 @@
+You are a senior AI systems engineer. Upgrade my EXISTING Worker Surveillance System into a FULLY REAL-TIME, OFFLINE, PRODUCTION-READY system.
+
+⚠️ STRICT RULES:
+
+* MUST work completely OFFLINE after export to VS Code
+* NO paid APIs
+* NO internet dependency
+* Use ONLY local models and services
+* Use Ollama (llama3) locally for AI
+* Keep code clean, modular, and production-ready
+
+---
+
+🎯 CORE UPGRADE GOAL:
+Convert the system from "upload-based detection" → "REAL-TIME VIDEO STREAM PROCESSING SYSTEM"
+
+---
+
+🧠 REQUIRED FEATURES:
+
+1. 🎥 REAL-TIME VIDEO STREAM
+
+* Accept:
+
+  * webcam (default)
+  * local video file
+* Stream continuously
+* Display in frontend live
+* NO upload-only system
+
+2. 🔍 AI PIPELINE (FULLY LOCAL)
+
+* YOLOv8 → detection
+* DeepSORT → tracking (unique worker IDs)
+* MediaPipe → pose detection
+
+3. 📦 FRAME PROCESSING ENGINE
+   Create module:
+   backend-ai/engine/video_processor.py
+
+Requirements:
+
+* Capture frames using OpenCV
+* Process frames in loop
+* Apply detection + tracking
+* Draw bounding boxes + IDs
+* Return processed frames
+
+4. 🌐 STREAMING API (CRITICAL)
+   Create endpoint:
+
+GET /stream
+
+* Use StreamingResponse (MJPEG stream)
+* Continuously send processed frames
+* Must work in browser <img src="/stream" />
+
+5. 🚨 ALERT ENGINE
+   Create:
+   backend-ai/engine/alert_engine.py
+
+Detect:
+
+* No helmet (placeholder logic OK)
+* Unsafe posture (MediaPipe)
+* Restricted zone entry
+
+Return:
+
+* SAFE / UNSAFE
+* violation type
+* severity (LOW / MEDIUM / HIGH)
+
+6. 🗄️ DATABASE (OFFLINE)
+   Use SQLite (NOT Postgres)
+
+Store in real-time:
+
+* worker_id
+* timestamp
+* violation
+* status
+
+7. 📊 DASHBOARD (LIVE DATA)
+
+* Active workers
+* Violations count
+* Alerts
+* Update in real-time
+
+8. 💬 AI ASSISTANT (OFFLINE)
+
+* Use Ollama llama3
+* Endpoint: POST /chat
+* Provide safety insights using DB data
+
+9. 📄 REPORT GENERATION
+
+* Generate PDF locally
+* Include:
+
+  * stats
+  * violations
+  * recommendations
+
+10. ⚡ PERFORMANCE OPTIMIZATION
+
+* Frame skip (process every 2–3 frames)
+* Resize frames (640x480)
+* Auto GPU detection (torch.cuda)
+
+---
+
+🏗️ ARCHITECTURE (STRICT)
+
+Frontend:
+
+* React / Next.js
+* Show live video using: <img src="http://localhost:8000/stream" />
+
+Backend:
+
+* FastAPI ONLY
+* NO Node.js
+
+---
+
+📂 FINAL PROJECT STRUCTURE
+
+project-root/
+│
+├── frontend/
+├── backend-ai/
+│   ├── main.py
+│   ├── engine/
+│   │   ├── video_processor.py
+│   │   ├── alert_engine.py
+│   │
+│   ├── detection/
+│   ├── tracking/
+│   ├── pose/
+│   ├── database/
+│   └── routes/
+│
+├── models/
+├── data/
+├── reports/
+├── requirements.txt
+├── docker-compose.yml
+└── README.md
+
+---
+
+🔌 API REQUIREMENTS
+
+GET /health
+
+GET /stream  ← REAL-TIME STREAM
+
+GET /analytics
+
+GET /history
+
+POST /chat (Ollama)
+
+GET /report
+
+---
+
+🧪 TEST FLOW (MUST WORK)
+
+1. Run backend → uvicorn main:app --reload
+2. Open frontend
+3. Start webcam stream
+4. See bounding boxes live
+5. See worker IDs (tracking)
+6. Alerts appear live
+7. Data stored in DB
+8. Dashboard updates
+9. Chat works offline (Ollama)
+10. PDF downloads
+
+---
+
+📦 FINAL OUTPUT REQUIREMENTS
+
+* Complete working code
+* requirements.txt (ALL dependencies)
+* README.md with:
+
+  * setup steps
+  * run commands
+  * Ollama setup
+* Must run in VS Code WITHOUT CHANGES
+
+---
+
+🎯 IMPORTANT:
+
+* Do NOT break existing working features
+* Upgrade system cleanly
+* Ensure real-time performance
+* Ensure offline-first design
+
+---
+
+STOP after generating full upgraded system.

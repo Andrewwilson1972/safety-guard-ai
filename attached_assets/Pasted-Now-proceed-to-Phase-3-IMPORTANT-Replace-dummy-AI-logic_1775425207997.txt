@@ -1,0 +1,123 @@
+Now proceed to Phase 3.
+
+IMPORTANT: Replace dummy AI logic with real computer vision pipeline.
+
+---
+
+🎯 GOAL:
+Integrate real worker detection, tracking, and pose estimation using YOLOv8, DeepSORT, and MediaPipe inside the FastAPI service.
+
+---
+
+📦 TASKS:
+
+### 1. INSTALL DEPENDENCIES (backend-ai)
+
+Add to requirements.txt:
+
+ultralytics
+opencv-python
+numpy
+torch
+mediapipe
+deep-sort-realtime
+
+---
+
+### 2. LOAD MODELS (ON STARTUP)
+
+Inside FastAPI:
+
+* Load YOLOv8 model (yolov8n.pt)
+* Initialize DeepSORT tracker
+* Initialize MediaPipe Pose
+
+Ensure models load only once (global initialization)
+
+---
+
+### 3. UPDATE /detect ENDPOINT
+
+Replace dummy logic with:
+
+* Accept uploaded image or video
+* If image:
+
+  * Run YOLO detection
+  * Filter "person"
+  * Apply DeepSORT tracking
+  * Run pose estimation on each detected person
+* If video:
+
+  * Process frame-by-frame (limit frames for now, e.g., first 30 frames)
+  * Perform same detection pipeline
+
+---
+
+### 4. OUTPUT FORMAT (IMPORTANT)
+
+Return structured JSON:
+
+{
+"workers": [
+{
+"id": 1,
+"bbox": [x1, y1, x2, y2],
+"confidence": 0.95,
+"status": "safe" or "unsafe",
+"violations": ["No Helmet"] or []
+}
+],
+"summary": {
+"total": 5,
+"safe": 3,
+"unsafe": 2
+}
+}
+
+---
+
+### 5. SAFETY LOGIC (SIMPLE RULES)
+
+For now:
+
+* If no helmet detected → "unsafe"
+* If pose indicates bending/fall (basic check) → "unsafe"
+* Else → "safe"
+
+(Keep logic simple, we improve later)
+
+---
+
+### 6. PERFORMANCE RULES
+
+* Resize frames before processing
+* Limit video frames (e.g., 20–30 frames)
+* Avoid heavy computation for now
+
+---
+
+### 7. ERROR HANDLING
+
+* Handle invalid files
+* Handle empty detections
+* Return clean JSON always
+
+---
+
+### 8. KEEP API SAME
+
+DO NOT change:
+POST /detect
+
+Ensure Express + frontend continue working without changes.
+
+---
+
+🧪 TEST:
+
+Upload image/video → UI should now show REAL detections instead of dummy data
+
+---
+
+STOP after successful integration.

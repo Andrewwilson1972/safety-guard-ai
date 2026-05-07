@@ -1,0 +1,141 @@
+You are a senior real-time video systems engineer.
+
+The system has one final issue:
+
+❌ Uploaded video does NOT play smoothly from start to end
+❌ Stream breaks and shows "Connecting..."
+❌ Video restarts or freezes
+❌ Detection is working but video playback is unstable
+
+---
+
+🎯 GOAL:
+
+Make video behave like a NORMAL VIDEO PLAYER:
+
+✔ Plays from beginning → end continuously
+✔ Never breaks or shows "Connecting..."
+✔ Bounding boxes visible in real-time
+✔ Detection runs without blocking video
+
+---
+
+🔧 FIX REQUIRED:
+
+1. 🎥 FIX FRAME LOOP (CRITICAL)
+
+In video_processor.py:
+
+Replace loop with:
+
+while True:
+
+```
+if self.cap is None:
+    continue
+
+ret, frame = self.cap.read()
+
+if not ret:
+    print("🔁 Video ended → restarting")
+    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    continue
+```
+
+---
+
+2. ⚡ SEPARATE DETECTION FROM PLAYBACK
+
+* DO NOT run detection on every frame
+
+Use:
+
+frame_count += 1
+
+if frame_count % 3 == 0:
+run detection
+store results in last_detections
+
+---
+
+3. 🧠 ALWAYS DRAW LAST DETECTIONS
+
+Even when detection not running:
+
+for det in last_detections:
+draw boxes
+
+👉 This ensures smooth video
+
+---
+
+4. 🎯 FIX FPS (IMPORTANT)
+
+Add:
+
+time.sleep(0.03)
+
+👉 keeps stable ~30 FPS
+👉 prevents CPU overload
+
+---
+
+5. 🚫 NEVER BREAK STREAM
+
+DO NOT:
+
+* return
+* break
+* stop loop
+
+Stream must run forever
+
+---
+
+6. 🎥 PRELOAD VIDEO START
+
+When starting video:
+
+self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
+👉 ensures start from beginning
+
+---
+
+7. 🧪 HANDLE FILE STREAMING PROPERLY
+
+Make sure:
+
+✔ cap.isOpened() is always checked
+✔ if fails → retry opening
+
+---
+
+8. 🌐 STREAM GENERATOR MUST NEVER BE EMPTY
+
+Even if detection fails:
+
+✔ Always send last frame
+
+---
+
+9. 🎯 FINAL RESULT
+
+When user uploads video:
+
+✔ Video starts immediately
+✔ Plays smoothly till end
+✔ Automatically loops
+✔ Bounding boxes update smoothly
+✔ No "Connecting..." ever
+
+---
+
+IMPORTANT:
+
+* Do NOT change architecture
+* Only FIX playback stability + smooth detection
+
+---
+
+STOP after video playback is fully stable.

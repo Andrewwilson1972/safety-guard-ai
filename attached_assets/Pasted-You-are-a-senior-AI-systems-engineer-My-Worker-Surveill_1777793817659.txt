@@ -1,0 +1,210 @@
+You are a senior AI systems engineer.
+
+My Worker Surveillance System with real-time MJPEG streaming is already implemented.
+
+Now your task is to FINALIZE, CLEAN, OPTIMIZE, and MAKE IT FULLY OFFLINE + EXPORT-READY FOR VS CODE.
+
+⚠️ STRICT REQUIREMENTS:
+
+* Must run completely OFFLINE
+* No external APIs
+* No internet required
+* Everything must work after exporting to VS Code
+* Do NOT break existing working features
+* Improve stability, performance, and structure
+
+---
+
+🎯 GOAL:
+Transform the current system into a PRODUCTION-READY OFFLINE AI SURVEILLANCE SYSTEM.
+
+---
+
+🔧 TASKS TO COMPLETE:
+
+1. ✅ FIX & CLEAN ARCHITECTURE
+
+* Ensure clear separation:
+
+  * engine/
+  * routes/
+  * database/
+  * utils/
+* Remove duplicate or unused code
+* Ensure modular design
+
+---
+
+2. ⚡ STREAM STABILITY IMPROVEMENTS
+
+* Ensure MJPEG stream never crashes
+* Add:
+
+  * auto-reconnect logic
+  * safe thread handling
+  * graceful shutdown
+* Prevent memory leaks in video processing loop
+
+---
+
+3. 🚀 PERFORMANCE OPTIMIZATION
+
+* Frame skipping (configurable)
+* Resize frames (default 640x480)
+* Add config file:
+
+backend-ai/config.py
+
+with:
+
+* frame_skip
+
+* resolution
+
+* model path
+
+* Add GPU/CPU auto-detection:
+  use torch.cuda if available
+
+---
+
+4. 🧠 AI PIPELINE IMPROVEMENTS
+
+* Ensure YOLOv8 loads only once (singleton)
+* Ensure DeepSORT tracker persists across frames
+* Ensure MediaPipe is efficient (no reinit per frame)
+
+---
+
+5. 🗄️ DATABASE OPTIMIZATION (SQLite)
+
+* Add indexing for:
+
+  * timestamp
+  * worker_id
+* Prevent duplicate entries
+* Batch insert support
+
+---
+
+6. 🚨 ALERT SYSTEM IMPROVEMENT
+
+* Add cooldown system (avoid duplicate alerts spam)
+* Add severity mapping:
+
+  * LOW
+  * MEDIUM
+  * HIGH
+  * CRITICAL
+
+---
+
+7. 🌐 FRONTEND IMPROVEMENTS
+
+* Add:
+
+  * loading state for stream
+  * error fallback UI
+  * reconnect button if stream stops
+* Improve:
+
+  * alert panel UI
+  * detection overlay clarity
+
+---
+
+8. 💬 OLLAMA OFFLINE AI (MANDATORY)
+
+* Ensure:
+
+  * fallback works if Ollama not running
+  * no crash if AI unavailable
+* Improve prompts:
+
+Include:
+
+* total violations
+* most frequent issue
+* recommendations
+
+---
+
+9. 📄 PDF REPORT IMPROVEMENTS
+
+* Ensure:
+
+  * works fully offline
+  * no AI dependency required
+* Improve formatting:
+
+  * title
+  * sections
+  * tables
+
+---
+
+10. 📦 EXPORT TO VS CODE GUARANTEE
+
+Create:
+
+✅ requirements.txt (ALL python deps)
+✅ package.json (frontend deps)
+✅ .env.example
+✅ README.md
+
+README must include:
+
+STEP-BY-STEP:
+
+1. Install Python deps
+2. Install frontend deps
+3. Install Ollama
+4. Run backend
+5. Run frontend
+
+---
+
+11. 🐳 OPTIONAL (IMPORTANT)
+
+* Fix docker-compose.yml:
+
+  * SQLite OR Postgres optional
+  * Ollama service
+
+---
+
+12. 🧪 FINAL TEST CHECKLIST
+
+Ensure ALL work:
+
+✔ /stream runs continuously
+✔ webcam mode works
+✔ video upload streaming works
+✔ bounding boxes visible
+✔ worker tracking works
+✔ alerts appear live
+✔ DB stores data
+✔ dashboard updates
+✔ assistant works offline (Ollama)
+✔ report downloads
+✔ no crashes
+
+---
+
+🎯 OUTPUT EXPECTATION:
+
+* Cleaned and optimized full codebase
+* Stable real-time system
+* Fully offline compatible
+* VS Code ready
+* Production-level structure
+
+---
+
+IMPORTANT:
+DO NOT REMOVE FEATURES
+ONLY IMPROVE, FIX, AND STABILIZE
+
+---
+
+STOP after completing full stabilization and providing final project.

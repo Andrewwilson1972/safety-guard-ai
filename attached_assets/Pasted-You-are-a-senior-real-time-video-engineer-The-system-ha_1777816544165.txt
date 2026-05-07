@@ -1,0 +1,143 @@
+You are a senior real-time video engineer.
+
+The system has already been refactored into:
+
+* Video Loop (fast)
+* AI Loop (slow)
+
+BUT there is still a critical issue:
+
+❌ Video frame is not updating continuously
+❌ Stream appears stuck on same frame
+❌ Detection updates but video does not move smoothly
+
+---
+
+🎯 GOAL:
+
+✔ Ensure video frames continuously update
+✔ Ensure no frame reuse or freezing
+✔ Ensure video plays from start → end smoothly
+
+---
+
+🔧 FINAL FIX:
+
+1. 🎥 VIDEO LOOP MUST ALWAYS READ NEW FRAME
+
+In video loop:
+
+ret, frame = cap.read()
+
+if not ret:
+cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+continue
+
+IMPORTANT:
+
+✔ ALWAYS assign:
+self.latest_frame = frame.copy()
+
+---
+
+2. 🚫 DO NOT REUSE OLD FRAME
+
+Remove any logic like:
+
+if latest_frame exists:
+reuse it
+
+❌ This causes freeze
+
+---
+
+3. 🧠 AI LOOP MUST NOT MODIFY VIDEO FRAME
+
+In AI loop:
+
+frame = self.latest_frame.copy()
+
+✔ NEVER modify original frame
+
+---
+
+4. 🧠 USE LOCK FOR SHARED DATA
+
+Add:
+
+from threading import Lock
+self.frame_lock = Lock()
+
+In video loop:
+
+with self.frame_lock:
+self.latest_frame = frame.copy()
+
+In AI loop:
+
+with self.frame_lock:
+frame = self.latest_frame.copy()
+
+---
+
+5. 🎯 ENSURE CAPTURE POINTER MOVES
+
+Add debug:
+
+print("FRAME POS:", cap.get(cv2.CAP_PROP_POS_FRAMES))
+
+👉 It must increase every iteration
+
+---
+
+6. ⚡ ENSURE VIDEO LOOP IS NOT BLOCKED
+
+Video loop should NOT contain:
+
+* YOLO
+* DeepSORT
+* MediaPipe
+
+---
+
+7. 🎥 STREAM MUST USE LATEST FRAME
+
+In MJPEG generator:
+
+frame = self.latest_frame.copy()
+
+draw detections
+
+send frame
+
+---
+
+8. 🧪 FINAL CHECK
+
+Console should show:
+
+FRAME POS: 1
+FRAME POS: 2
+FRAME POS: 3
+...
+
+✔ If numbers not increasing → bug still exists
+
+---
+
+🎯 FINAL RESULT:
+
+✔ Video plays smoothly
+✔ Frames continuously update
+✔ Detection overlays correctly
+✔ No freeze
+
+---
+
+IMPORTANT:
+Do NOT redesign again
+Just FIX frame update + thread sync
+
+---
+
+STOP after video frame update is fixed.

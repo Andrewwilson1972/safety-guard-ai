@@ -1,0 +1,23 @@
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.12
+
+# ── Computer vision ───────────────────────────────────────────────────────────
+opencv-python-headless
+numpy
+
+# ── AI / detection ────────────────────────────────────────────────────────────
+ultralytics
+mediapipe==0.10.33
+deep-sort-realtime
+
+# ── PyTorch CPU-only (no CUDA required — works fully offline)
+# For GPU: replace these with: pip install torch torchvision
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
+
+# ── Ollama HTTP client (offline AI chat) ──────────────────────────────────────
+requests
+
+# ── stdlib (no install needed): sqlite3, threading, json, pathlib, asyncio

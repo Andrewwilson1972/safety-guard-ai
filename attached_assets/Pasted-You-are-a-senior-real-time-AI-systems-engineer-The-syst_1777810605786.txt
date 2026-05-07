@@ -1,0 +1,186 @@
+You are a senior real-time AI systems engineer.
+
+The system has a critical issue:
+
+❌ Upload video does NOT appear in live stream
+❌ Stream stays on "Connecting..."
+❌ Detection panel updates but video is not shown
+❌ Bounding boxes not visible
+
+---
+
+🎯 GOAL:
+
+When uploading a video:
+✔ The uploaded video MUST play in the main stream
+✔ Bounding boxes MUST be visible
+✔ Detection + video MUST be perfectly synced
+
+---
+
+🔴 ROOT FIX (MANDATORY)
+
+DO NOT PATCH — REBUILD STREAM SOURCE HANDLING CLEANLY
+
+---
+
+1. 🔥 SINGLE SOURCE OF TRUTH (CRITICAL)
+
+In video_processor.py:
+
+Create:
+
+self.cap = None
+self.source_path = None
+self.is_running = False
+
+---
+
+2. 🎥 CREATE CLEAN START FUNCTION
+
+def start(source_path):
+if self.cap:
+self.cap.release()
+
+```
+self.cap = cv2.VideoCapture(source_path)
+self.source_path = source_path
+
+if not self.cap.isOpened():
+    print("❌ FAILED TO OPEN VIDEO:", source_path)
+    return False
+
+print("✅ STREAMING FROM:", source_path)
+self.is_running = True
+return True
+```
+
+---
+
+3. 🔁 FIX UPLOAD ENDPOINT
+
+In /stream/upload:
+
+* Save file
+* Call:
+
+video_processor.start(saved_path)
+
+* RETURN success ONLY if cap opened
+
+---
+
+4. 🌐 FIX STREAM GENERATOR
+
+def generate_frames():
+
+```
+while True:
+
+    if not self.cap or not self.cap.isOpened():
+        continue
+
+    ret, frame = self.cap.read()
+
+    if not ret:
+        print("🔁 VIDEO ENDED — LOOPING")
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        continue
+
+    # RUN YOLO + TRACKING HERE
+    # DRAW BOXES
+
+    _, buffer = cv2.imencode('.jpg', frame)
+
+    yield (
+        b'--frame\r\n'
+        b'Content-Type: image/jpeg\r\n\r\n' +
+        buffer.tobytes() +
+        b'\r\n'
+    )
+```
+
+---
+
+5. 🧪 ADD HARD DEBUG LOGS
+
+PRINT:
+
+* video path
+* cap.isOpened()
+* frame read success
+
+---
+
+6. 🌐 FRONTEND FIX
+
+After upload:
+
+* DO NOT wait complicated polling
+* Just do:
+
+setStreamUrl(`/api/stream?t=${Date.now()}`)
+
+---
+
+7. ⚠️ ABSOLUTE CHECK
+
+Ensure:
+
+✔ uploaded file path is correct
+✔ OpenCV can read it
+✔ file exists on disk
+
+---
+
+8. 🧪 FINAL TEST
+
+9. Upload video
+
+10. Console shows:
+
+✅ STREAMING FROM: <your file>
+
+3. Video appears immediately
+4. Bounding boxes visible
+5. Detection panel updates
+
+---
+
+🎯 BONUS FEATURE (PDF POPUP)
+
+After detection completes:
+
+✔ Trigger frontend popup:
+
+"Detection report ready"
+
+✔ Add button:
+
+Download PDF
+
+Backend:
+
+POST /report/generate
+
+Return:
+
+{
+"url": "/reports/report_123.pdf"
+}
+
+Frontend:
+
+Show toast notification with download button
+
+---
+
+IMPORTANT:
+
+* Remove old broken logic
+* Use SINGLE video source handling
+* Ensure real video playback works
+
+---
+
+STOP after fixing streaming + adding PDF popup feature

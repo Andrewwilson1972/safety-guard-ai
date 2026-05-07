@@ -1,0 +1,141 @@
+You are a senior real-time streaming + computer vision engineer.
+
+The system is already working:
+
+* MJPEG stream
+* Video upload switching
+* Detection + tracking
+* Frontend polling
+
+BUT there is still a small UX issue:
+
+❌ "Connecting..." appears during source switch
+❌ Slight delay before video starts
+❌ Bounding boxes appear with delay
+
+---
+
+🎯 GOAL:
+
+Make the stream feel INSTANT and CONTINUOUS like CCTV:
+
+✔ No visible "Connecting..." flicker
+✔ Video starts immediately after upload
+✔ Bounding boxes appear from first visible frame
+✔ No blank frames
+
+---
+
+🔧 FINAL FIXES:
+
+1. 🧠 KEEP LAST FRAME DURING SWITCH (ALREADY PARTIAL — COMPLETE IT)
+
+In video_processor.py:
+
+* Ensure generator ALWAYS yields a frame:
+
+if self._latest_jpeg is None:
+continue  # ❌ wrong
+
+✔ Instead:
+
+if self._latest_jpeg is None:
+yield last_valid_frame
+
+* Maintain:
+
+self.last_valid_frame
+
+---
+
+2. ⚡ PRELOAD FIRST FRAME BEFORE STREAM START
+
+When new source is set:
+
+* Open VideoCapture
+* Read 1 frame immediately
+* Run detection once
+* Store it in:
+
+self._latest_jpeg
+
+👉 So stream never starts empty
+
+---
+
+3. 🔄 SMOOTH SOURCE SWITCH (NO HARD STOP)
+
+Instead of:
+
+stop() → start()
+
+✔ Do:
+
+* Soft switch:
+  self.cap = new VideoCapture
+  keep thread alive
+
+👉 Avoid killing stream thread completely
+
+---
+
+4. 🌐 FRONTEND: REMOVE HARD RESET FLICKER
+
+Current:
+img src reset → blank → reconnect
+
+❌ causes flicker
+
+✔ Instead:
+
+* Keep old stream visible
+
+* Only switch src AFTER:
+  stream status = running AND source matched
+
+* DO NOT blank the image before switching
+
+---
+
+5. ⏱️ REDUCE STARTUP DELAY
+
+* Reduce polling interval:
+  200ms → 100ms
+
+* Timeout:
+  max 2 seconds (not 4)
+
+---
+
+6. 🎥 FORCE FIRST FRAME FAST
+
+Inside stream loop:
+
+if first_frame:
+skip frame_skip logic
+run detection immediately
+
+👉 ensures bounding boxes appear instantly
+
+---
+
+7. 🧪 FINAL EXPERIENCE
+
+User uploads video →
+
+✔ Video appears immediately
+✔ No "Connecting..." flicker
+✔ Bounding boxes visible from start
+✔ Detection panel syncs instantly
+
+---
+
+IMPORTANT:
+
+* Do NOT rewrite system
+* Only improve stream continuity + startup speed
+* Keep all existing features intact
+
+---
+
+STOP after final smoothing is complete.

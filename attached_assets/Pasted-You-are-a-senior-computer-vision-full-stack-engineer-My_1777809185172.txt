@@ -1,0 +1,164 @@
+You are a senior computer vision + full-stack engineer.
+
+My system already has:
+
+* YOLOv8 + DeepSORT + MediaPipe
+* FastAPI MJPEG streaming (/stream)
+* Frontend live video page
+
+BUT there is a problem:
+
+❌ The video is not behaving like a real-time player with detection
+❌ Bounding boxes are not smoothly synced
+❌ Detection results are not updating below the video in real-time
+
+---
+
+🎯 GOAL:
+
+Make the system behave like a REAL CCTV MONITOR:
+
+✔ Video plays continuously (no freezing)
+✔ Bounding boxes appear ON the video in real-time
+✔ Detection results update LIVE below the video
+✔ Everything runs simultaneously (not sequential)
+
+---
+
+🔧 REQUIRED FIXES:
+
+1. 🎥 FIX VIDEO STREAM LOOP (CRITICAL)
+
+In video_processor.py:
+
+* Ensure frame reading is continuous
+* DO NOT block on detection
+* Use this pattern:
+
+WHILE TRUE:
+read frame
+if frame_skip:
+run detection
+else:
+reuse last detections
+
+👉 This ensures smooth video playback
+
+---
+
+2. ⚡ ADD NON-BLOCKING DETECTION
+
+* Run YOLO + DeepSORT in a separate thread OR reuse last results
+* DO NOT run heavy detection on every frame
+
+Example logic:
+
+* Every 3rd frame → run detection
+* Other frames → just draw previous boxes
+
+---
+
+3. 🧠 STORE LAST DETECTIONS (IMPORTANT)
+
+Create global/shared state:
+
+last_detections = []
+
+Update only when detection runs
+
+Then always draw:
+
+for det in last_detections:
+draw bounding boxes
+
+---
+
+4. 🌐 LIVE DETECTION API (FOR UI PANEL)
+
+Create endpoint:
+
+GET /stream/detections
+
+Return:
+
+{
+"workers": [
+{
+"id": 1,
+"name": "Andrew",
+"status": "safe",
+"violation": "none",
+"confidence": 0.91
+}
+]
+}
+
+---
+
+5. 🔴 FRONTEND REAL-TIME PANEL
+
+In video-feed page:
+
+* Keep MJPEG <img> for video
+* BELOW video add:
+
+"Live Detections Panel"
+
+* Poll every 1 second OR use SSE:
+
+Display:
+
+* Worker ID
+* Name
+* Status
+* Violation
+
+---
+
+6. 🎯 ENSURE VIDEO NEVER FREEZES
+
+* Add FPS control (~20–25 FPS)
+* Add small sleep:
+
+time.sleep(0.03)
+
+* Prevent CPU overload
+
+---
+
+7. 🧪 TEST BEHAVIOR (VERY IMPORTANT)
+
+Final system must behave like this:
+
+1. Video starts → plays smoothly
+2. Bounding boxes appear instantly
+3. Tracking IDs persist
+4. Detection panel updates every second
+5. No lag / no freezing
+
+---
+
+8. 🧠 KEEP EXISTING FEATURES
+
+* DO NOT break:
+
+  * alert system
+  * SSE alerts
+  * dashboard
+  * database
+  * chat / report
+
+Only FIX real-time sync
+
+---
+
+🎯 FINAL EXPECTATION:
+
+✔ Smooth real-time video playback
+✔ Bounding boxes always visible
+✔ Detection results updating live below video
+✔ System feels like CCTV surveillance software
+
+---
+
+STOP after fixing real-time video + detection synchronization.

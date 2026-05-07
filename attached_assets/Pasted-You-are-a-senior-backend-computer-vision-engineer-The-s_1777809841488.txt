@@ -1,0 +1,129 @@
+You are a senior backend + computer vision engineer.
+
+The system has:
+
+* MJPEG stream endpoint (/stream)
+* Video upload endpoint (/stream/upload)
+* Video processor engine
+* Frontend video feed page
+
+❌ ISSUE:
+When uploading a video:
+
+* The video does NOT play in the main stream
+* Stream stays stuck on "Connecting"
+* Bounding boxes do not appear
+* Detection panel works but stream is not linked
+
+---
+
+🎯 GOAL:
+
+When a user uploads a video:
+✔ The SAME video must start streaming in /stream
+✔ Bounding boxes must appear in real-time
+✔ Detection + stream must be synced
+
+---
+
+🔧 FIX REQUIRED:
+
+1. 🎥 FIX VIDEO SOURCE SWITCHING (CRITICAL)
+
+In video_processor.py:
+
+* Add global state:
+
+self.current_source = None
+
+* When /stream/upload is called:
+  → Save uploaded file
+  → Set:
+
+self.current_source = uploaded_file_path
+
+* Restart capture:
+
+self.cap = cv2.VideoCapture(self.current_source)
+
+---
+
+2. 🔁 FORCE STREAM RESTART AFTER UPLOAD
+
+After upload:
+
+* Stop previous stream safely
+* Reinitialize VideoCapture with new file
+* Reset:
+
+  * tracker
+  * frame count
+  * detections
+
+---
+
+3. 🌐 ENSURE /stream USES CURRENT SOURCE
+
+In generate_frames():
+
+❌ DO NOT hardcode webcam (0)
+✔ ALWAYS use:
+
+cv2.VideoCapture(self.current_source)
+
+---
+
+4. ⚠️ FIX "CONNECTING" ISSUE
+
+Frontend:
+
+* After upload success:
+  → force reload stream:
+
+setStreamUrl(`/api/stream?t=${Date.now()}`)
+
+👉 This avoids browser caching
+
+---
+
+5. 🧪 ADD DEBUG LOGS
+
+Print:
+
+"Streaming from: <source_path>"
+
+Confirm:
+
+* Correct file is being used
+* Capture is opening successfully
+
+---
+
+6. 🛑 HANDLE VIDEO END
+
+If video ends:
+
+* Loop video OR
+* Show "Stream ended" message
+
+---
+
+7. 🎯 FINAL BEHAVIOR
+
+When user uploads video:
+
+1. Video instantly starts playing
+2. Bounding boxes appear
+3. Detection panel updates
+4. No "Connecting..." stuck state
+
+---
+
+IMPORTANT:
+
+* Do NOT break webcam/demo mode
+* Only fix video upload → stream integration
+
+---
+
+STOP after fixing video upload streaming issue.

@@ -1,0 +1,222 @@
+You are a senior AI systems engineer. Build a FULLY OFFLINE, production-ready AI-powered Worker Surveillance and Safety Monitoring System.
+
+⚠️ STRICT RULES (VERY IMPORTANT):
+
+* The system MUST work completely OFFLINE after export to VS Code
+* DO NOT use any paid APIs
+* DO NOT depend on internet services
+* Use ONLY local models and libraries
+* Use Ollama (LLaMA3) locally for AI assistant & reports
+* All dependencies must be installable via requirements.txt / package.json
+* Ensure everything runs locally with simple commands
+
+---
+
+🎯 SYSTEM FEATURES REQUIRED:
+
+1. REAL-TIME VIDEO PROCESSING
+
+* Accept webcam or uploaded video
+* Display video in UI
+* Perform real-time detection
+* Draw bounding boxes
+* Show worker ID + tracking
+
+2. AI DETECTION PIPELINE (LOCAL ONLY)
+
+* YOLOv8 → person detection
+* DeepSORT → tracking (assign unique IDs)
+* MediaPipe → pose estimation
+* PPE detection (helmet, mask optional placeholder)
+
+3. ALERT SYSTEM
+
+* Detect unsafe conditions:
+
+  * no helmet
+  * unsafe posture
+  * restricted zone entry
+* Show alerts in real-time UI
+* Severity levels: LOW / MEDIUM / HIGH
+
+4. DASHBOARD
+
+* Total workers
+* Active workers
+* Violations
+* Active alerts
+* Live updating charts
+
+5. HISTORY PAGE
+
+* Store all detections
+* Filter:
+
+  * date
+  * worker ID
+  * violation type
+
+6. AI ASSISTANT (OFFLINE)
+
+* Use Ollama (llama3)
+* Answer:
+
+  * safety insights
+  * worker summaries
+  * recommendations
+
+7. REPORT GENERATION
+
+* Generate PDF reports locally
+* Include:
+
+  * summary
+  * violations
+  * recommendations
+
+8. DATABASE (LOCAL)
+
+* Use SQLite (NOT PostgreSQL for offline simplicity)
+  Tables:
+* workers
+* detections
+* alerts
+* reports
+
+9. UI REQUIREMENTS
+
+* Dark theme
+* Sidebar navigation:
+
+  * Dashboard
+  * Video Feed
+  * Alerts
+  * History
+  * Assistant
+  * Reports
+* Show live detection feed with bounding boxes
+* Show alert popups below video
+
+---
+
+🏗️ ARCHITECTURE (STRICTLY FOLLOW)
+
+Frontend:
+
+* React + Vite OR Next.js
+* Tailwind CSS
+
+Backend:
+
+* FastAPI (Python ONLY, no Node.js needed)
+
+AI Service:
+
+* Integrated inside FastAPI
+
+---
+
+📂 PROJECT STRUCTURE
+
+project-root/
+│
+├── frontend/
+├── backend/
+│   ├── main.py
+│   ├── detection/
+│   ├── tracking/
+│   ├── pose/
+│   ├── database/
+│   ├── routes/
+│   └── utils/
+│
+├── models/
+├── data/
+├── reports/
+├── requirements.txt
+└── README.md
+
+---
+
+⚙️ BACKEND REQUIREMENTS
+
+FastAPI endpoints:
+
+GET /health
+
+POST /detect/video
+
+* input: video/webcam
+* output:
+  {
+  "workers": [
+  {
+  "id": 1,
+  "bbox": [x1, y1, x2, y2],
+  "status": "safe/unsafe",
+  "violation": "no helmet"
+  }
+  ]
+  }
+
+GET /analytics
+
+GET /history
+
+POST /chat (uses Ollama locally)
+
+GET /report (generate PDF locally)
+
+---
+
+🧠 AI INTEGRATION
+
+* Use ultralytics YOLOv8 (local weights)
+* Use DeepSORT for tracking
+* Use MediaPipe for pose detection
+* Use Ollama (llama3) locally:
+  command: ollama run llama3
+
+---
+
+🧪 TEST FLOW (MUST WORK)
+
+1. Start backend → works offline
+2. Start frontend → connects locally
+3. Upload video OR use webcam
+4. Detection starts
+5. Bounding boxes visible
+6. Alerts appear in UI
+7. Data stored in DB
+8. Dashboard updates
+9. Assistant answers questions
+10. Report downloads as PDF
+
+---
+
+📦 FINAL REQUIREMENTS
+
+* Provide FULL working code
+* Provide requirements.txt
+* Provide setup instructions:
+  pip install -r requirements.txt
+  npm install
+* Provide run commands:
+  uvicorn main:app --reload
+  npm run dev
+* Ensure NO missing dependencies
+* Ensure export to VS Code works without breaking
+
+---
+
+🎯 OUTPUT EXPECTATION
+
+* Complete working system
+* Clean code
+* Modular structure
+* Real-time detection working
+* Fully offline functionality
+
+---
+
+STOP after generating full working project structure and code.

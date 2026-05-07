@@ -1,0 +1,514 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Worker Safety Monitoring API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: dashboard
+    description: Dashboard summary data
+  - name: ai
+    description: AI detection endpoints
+  - name: analytics
+    description: Analytics and reporting
+  - name: history
+    description: Detection history
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/recent-alerts:
+    get:
+      operationId: getRecentAlerts
+      tags: [dashboard]
+      summary: Recent safety alerts
+      responses:
+        "200":
+          description: List of recent alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+
+  /dashboard/worker-activity:
+    get:
+      operationId: getWorkerActivity
+      tags: [dashboard]
+      summary: Worker activity over time
+      responses:
+        "200":
+          description: Worker activity data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityDataPoint"
+
+  /dashboard/violation-breakdown:
+    get:
+      operationId: getViolationBreakdown
+      tags: [dashboard]
+      summary: Violation breakdown by type
+      responses:
+        "200":
+          description: Violation breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ViolationCategory"
+
+  /detect:
+    post:
+      operationId: detectWorkers
+      tags: [ai]
+      summary: Detect workers in uploaded file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        "200":
+          description: Detection results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetectionResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: AI service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics]
+      summary: Overall analytics summary
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+
+  /analytics/trends:
+    get:
+      operationId: getAnalyticsTrends
+      tags: [analytics]
+      summary: Daily detection trends (last 30 days)
+      responses:
+        "200":
+          description: Daily trends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendDataPoint"
+
+  /analytics/worker/{id}:
+    get:
+      operationId: getWorkerAnalytics
+      tags: [analytics]
+      summary: Individual worker analytics
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Worker analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkerAnalytics"
+        "404":
+          description: Worker not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /history:
+    get:
+      operationId: getDetectionHistory
+      tags: [history]
+      summary: Detection history with filters
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: workerId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [safe, unsafe]
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Paginated detection history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetectionHistoryPage"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    DashboardStats:
+      type: object
+      properties:
+        totalWorkers:
+          type: integer
+        activeWorkers:
+          type: integer
+        totalViolations:
+          type: integer
+        activeAlerts:
+          type: integer
+        safetyScore:
+          type: number
+        camerasOnline:
+          type: integer
+      required:
+        - totalWorkers
+        - activeWorkers
+        - totalViolations
+        - activeAlerts
+        - safetyScore
+        - camerasOnline
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        message:
+          type: string
+        workerId:
+          type: ["integer", "null"]
+        zone:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        resolved:
+          type: boolean
+      required: [id, type, severity, message, zone, timestamp, resolved]
+
+    ActivityDataPoint:
+      type: object
+      properties:
+        hour:
+          type: string
+        workers:
+          type: integer
+        violations:
+          type: integer
+      required: [hour, workers, violations]
+
+    ViolationCategory:
+      type: object
+      properties:
+        category:
+          type: string
+        count:
+          type: integer
+        color:
+          type: string
+      required: [category, count, color]
+
+    DetectedWorker:
+      type: object
+      properties:
+        id:
+          type: integer
+        bbox:
+          type: array
+          items:
+            type: integer
+        status:
+          type: string
+          enum: [safe, unsafe]
+        confidence:
+          type: number
+        violations:
+          type: array
+          items:
+            type: string
+      required: [id, bbox, status, confidence, violations]
+
+    DetectionSummary:
+      type: object
+      properties:
+        total_workers:
+          type: integer
+        safe_workers:
+          type: integer
+        unsafe_workers:
+          type: integer
+        violations_detected:
+          type: integer
+      required:
+        - total_workers
+        - safe_workers
+        - unsafe_workers
+        - violations_detected
+
+    DetectionResult:
+      type: object
+      properties:
+        file_name:
+          type: ["string", "null"]
+        file_size_kb:
+          type: number
+        content_type:
+          type: string
+        workers:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetectedWorker"
+        summary:
+          $ref: "#/components/schemas/DetectionSummary"
+        model:
+          type: string
+        note:
+          type: string
+      required: [file_size_kb, content_type, workers, summary, model, note]
+
+    AnalyticsSummary:
+      type: object
+      properties:
+        totalWorkers:
+          type: integer
+        totalDetections:
+          type: integer
+        safeDetections:
+          type: integer
+        unsafeDetections:
+          type: integer
+        safetyScore:
+          type: number
+      required:
+        - totalWorkers
+        - totalDetections
+        - safeDetections
+        - unsafeDetections
+        - safetyScore
+
+    TrendDataPoint:
+      type: object
+      properties:
+        day:
+          type: string
+        total:
+          type: integer
+        unsafe:
+          type: integer
+        violations:
+          type: integer
+      required: [day, total, unsafe, violations]
+
+    WorkerStat:
+      type: object
+      properties:
+        totalDetections:
+          type: integer
+        safeDetections:
+          type: integer
+        unsafeDetections:
+          type: integer
+        safetyScore:
+          type: number
+        topViolations:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+            required: [name, count]
+      required:
+        - totalDetections
+        - safeDetections
+        - unsafeDetections
+        - safetyScore
+        - topViolations
+
+    WorkerRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        trackId:
+          type: integer
+        name:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, trackId, createdAt]
+
+    WorkerAnalytics:
+      type: object
+      properties:
+        worker:
+          $ref: "#/components/schemas/WorkerRecord"
+        stats:
+          $ref: "#/components/schemas/WorkerStat"
+        recentDetections:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetectionRecord"
+      required: [worker, stats, recentDetections]
+
+    DetectionRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        workerId:
+          type: integer
+        workerName:
+          type: ["string", "null"]
+        trackId:
+          type: ["integer", "null"]
+        uploadId:
+          type: string
+        status:
+          type: string
+          enum: [safe, unsafe]
+        violations:
+          type: array
+          items:
+            type: string
+        confidence:
+          type: number
+        bbox:
+          type: array
+          items:
+            type: number
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - id
+        - workerId
+        - uploadId
+        - status
+        - violations
+        - confidence
+        - bbox
+        - timestamp
+
+    DetectionHistoryPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetectionRecord"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+            totalPages:
+              type: integer
+          required: [page, limit, total, totalPages]
+      required: [data, pagination]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]

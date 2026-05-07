@@ -1,0 +1,175 @@
+You are a senior full-stack AI systems engineer.
+
+My project (AI Worker Surveillance System) is already built.
+
+Now I want you to generate a COMPLETE PROJECT OVERVIEW including ALL FILES and FULL SYSTEM FLOW.
+
+---
+
+🎯 GOAL:
+
+Give me EVERYTHING needed to understand, debug, and run this project in VS Code.
+
+---
+
+📂 1. FULL PROJECT STRUCTURE
+
+Show complete folder tree like:
+
+project-root/
+├── frontend/
+├── backend-ai/
+├── engine/
+├── routes/
+├── database/
+├── models/
+├── reports/
+├── artifacts/
+├── requirements.txt
+├── package.json
+├── README.md
+
+---
+
+📄 2. LIST ALL FILES (IMPORTANT)
+
+For EACH file:
+
+* File name
+* Path
+* Purpose
+* Key functions inside
+
+Example:
+
+backend-ai/engine/video_processor.py
+→ Handles real-time video pipeline
+→ Functions: start(), stop(), video_loop(), detection_loop()
+
+---
+
+🔄 3. FULL SYSTEM FLOW (VERY IMPORTANT)
+
+Explain step-by-step:
+
+User → Upload Video
+→ Backend receives
+→ OpenCV loads video
+→ Video loop reads frames
+→ Detection loop runs YOLO
+→ DeepSORT assigns IDs
+→ MediaPipe detects pose
+→ Alert engine checks violations
+→ Results stored in DB
+→ Stream overlays boxes
+→ Frontend displays video
+
+---
+
+🎥 4. REAL-TIME PIPELINE EXPLANATION
+
+Explain clearly:
+
+* Video loop (fast)
+* Detection loop (slow)
+* Shared variables (latest_frame, last_detections)
+* Thread synchronization
+
+---
+
+🌐 5. ALL API ENDPOINTS
+
+List ALL endpoints with:
+
+* Route
+* Method
+* Purpose
+
+Example:
+
+GET /stream → MJPEG video
+POST /stream/upload → upload video
+
+---
+
+🎨 6. FRONTEND FLOW
+
+Explain:
+
+* How video is displayed
+* How MJPEG works
+* How detection panel updates
+* How alerts work
+
+---
+
+🧠 7. AI COMPONENTS
+
+Explain:
+
+* YOLOv8 detection
+* DeepSORT tracking
+* MediaPipe pose
+* Ollama AI assistant
+
+---
+
+🗄️ 8. DATABASE
+
+Explain:
+
+* Tables
+* What data is stored
+* How it's used
+
+---
+
+📄 9. REPORT SYSTEM
+
+Explain:
+
+* How PDF is generated
+* Where data comes from
+
+---
+
+⚙️ 10. HOW TO RUN LOCALLY
+
+Step-by-step:
+
+* install dependencies
+* run backend
+* run frontend
+* test system
+
+---
+
+⚠️ 11. COMMON ISSUES
+
+Explain:
+
+* video not playing
+* stream freezing
+* node errors
+* opencv issues
+
+---
+
+🎯 OUTPUT FORMAT:
+
+* Clean
+* Structured
+* Easy to read
+* No missing parts
+
+---
+
+IMPORTANT:
+
+DO NOT skip any file
+DO NOT give partial answer
+Give FULL system overview
+
+---
+
+STOP after complete documentation.

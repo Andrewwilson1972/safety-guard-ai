@@ -1,0 +1,66 @@
+version: "3.9"
+
+# ── Worker Safety Monitor — Local Development Stack ───────────────────────────
+#
+# Usage:
+#   docker-compose up -d               # start all services
+#   docker-compose up -d postgres      # PostgreSQL only
+#   docker-compose up -d postgres ollama  # + offline AI
+#   docker-compose down                # stop all
+#   docker-compose down -v             # stop + delete volumes
+#
+# After starting:
+#   cp .env.example .env
+#   pnpm --filter @workspace/db run migrate
+
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: worker-safety-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB:       worker_safety
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:     ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout:  5s
+      retries:  10
+
+  # ── Ollama (offline AI) ───────────────────────────────────────────────────────
+  # Serves llama3 locally — no internet needed after the first pull.
+  # Native Ollama install (https://ollama.ai) is faster than Docker for CPU inference.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: worker-safety-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: >
+      /bin/sh -c "
+        ollama serve &
+        sleep 8 &&
+        ollama pull llama3 &&
+        wait
+      "
+    # GPU support — uncomment if you have NVIDIA drivers + nvidia-container-toolkit
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  postgres_data:
+  ollama_data:

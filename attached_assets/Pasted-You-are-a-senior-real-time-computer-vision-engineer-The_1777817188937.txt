@@ -1,0 +1,135 @@
+You are a senior real-time computer vision engineer.
+
+The system already has:
+
+* Separate video loop (fast)
+* Separate AI loop (slow)
+
+BUT video is still freezing / not progressing.
+
+---
+
+🎯 ROOT ISSUE:
+
+latest_frame is not being updated correctly across threads.
+
+---
+
+🎯 GOAL:
+
+✔ Video frames must continuously update
+✔ No frame reuse
+✔ No freezing
+✔ Detection overlays correctly
+
+---
+
+🔧 FINAL FIX (MANDATORY)
+
+1. 🧠 DEFINE SHARED VARIABLES
+
+self.latest_frame = None
+self.last_detections = []
+self.frame_lock = Lock()
+
+---
+
+2. 🎥 VIDEO LOOP (CRITICAL FIX)
+
+while True:
+
+```
+ret, frame = self.cap.read()
+
+if not ret:
+    print("🔁 LOOP VIDEO")
+    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    continue
+
+with self.frame_lock:
+    self.latest_frame = frame.copy()
+
+# DO NOT MODIFY frame here
+
+time.sleep(0.03)
+```
+
+---
+
+3. 🧠 AI LOOP (READ-ONLY FRAME)
+
+while True:
+
+```
+with self.frame_lock:
+    if self.latest_frame is None:
+        continue
+    frame = self.latest_frame.copy()
+
+# RUN YOLO ON frame
+results = model(frame)
+
+# UPDATE detections safely
+with self.frame_lock:
+    self.last_detections = parsed_results
+```
+
+---
+
+4. 🌐 STREAM GENERATOR (DRAW HERE ONLY)
+
+while True:
+
+```
+with self.frame_lock:
+    if self.latest_frame is None:
+        continue
+    frame = self.latest_frame.copy()
+    detections = self.last_detections.copy()
+
+# DRAW bounding boxes HERE ONLY
+for det in detections:
+    draw boxes
+
+encode + yield frame
+```
+
+---
+
+5. 🚫 REMOVE ALL THESE (IMPORTANT)
+
+❌ No detection in video loop
+❌ No drawing in AI loop
+❌ No shared frame modification outside lock
+
+---
+
+6. 🧪 DEBUG CHECK
+
+Add:
+
+print("FRAME UPDATE OK")
+
+inside video loop
+
+👉 Must print continuously
+
+---
+
+7. 🎯 FINAL RESULT
+
+✔ Video plays smoothly from start → end
+✔ No freezing
+✔ Detection updates correctly
+✔ Stream always live
+
+---
+
+IMPORTANT:
+
+* DO NOT redesign system again
+* ONLY fix shared frame handling
+
+---
+
+STOP after fixing frame synchronization.
